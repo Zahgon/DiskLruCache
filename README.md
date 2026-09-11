@@ -4,7 +4,7 @@ Disk LRU Cache
 A cache that uses a bounded amount of space on a filesystem. Each cache entry
 has a string key and a fixed number of values. Each key must match the regex
 `[a-z0-9_-]{1,120}`.  Values are byte sequences, accessible as streams or files.
-Each value must be between `0` and `Integer.MAX_VALUE` bytes in length.
+Each value must be between `0` and `Number.MAX_SAFE_INTEGER` bytes in length.
 
 The cache stores its data in a directory on the filesystem. This directory must
 be exclusive to the cache; the cache may delete or overwrite files from its
@@ -41,31 +41,48 @@ error occurs while writing a cache value, the edit will fail silently. Callers
 should handle other problems by catching `IOException` and responding
 appropriately.
 
-*Note: This implementation specifically targets Android compatibility.*
+*Note: This is a TypeScript port of the original Java implementation. The
+on-disk journal format is unchanged, so a cache directory written by either
+implementation can be opened by the other.*
 
 
 
 Download
 ========
 
-Download [the latest .jar][jar] or grab via Maven:
-```xml
-<dependency>
-  <groupId>com.jakewharton</groupId>
-  <artifactId>disklrucache</artifactId>
-  <version>2.0.2</version>
-</dependency>
-```
-or Gradle:
-```groovy
-compile 'com.jakewharton:disklrucache:2.0.2'
+```sh
+npm install disklrucache
 ```
 
-Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
+Usage
+=====
+
+```ts
+import { DiskLruCache } from 'disklrucache';
+
+const cache = DiskLruCache.open(directory, appVersion, 2, 10 * 1024 * 1024);
+
+const editor = cache.edit('key1');
+if (editor !== null) {
+  editor.set(0, 'value');
+  editor.set(1, 'metadata');
+  editor.commit();
+}
+
+const snapshot = cache.get('key1');
+if (snapshot !== null) {
+  console.log(snapshot.getString(0));
+  snapshot.close();
+}
+
+cache.close();
+```
 
 If you would like to compile your own version, the library can be built by
-running `mvn clean verify`. The output JAR will be in the `target/` directory.
-*(Note: this requires Maven be installed)*
+running `npm install && npm run build`. The output will be in the `dist/`
+directory. The full check — lint, type-check and tests with coverage — is
+`npm run verify`.
+*(Note: this requires Node.js 18 or newer)*
 
 
 
@@ -88,6 +105,3 @@ License
     limitations under the License.
 
 
-
- [jar]: https://search.maven.org/remote_content?g=com.jakewharton&a=disklrucache&v=LATEST
- [snap]: https://oss.sonatype.org/content/repositories/snapshots/

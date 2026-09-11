@@ -1,8 +1,21 @@
-#Eclipse
-.project
-.classpath
-.settings
-.checkstyle
+#Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+#Logs
+*.log
+npm-debug.log*
+
+#Local env / secrets
+.env
+.env.*
+!.env.example
+
+#Packaging output
+*.tgz
 
 #IntelliJ IDEA
 .idea
@@ -10,10 +23,13 @@
 *.ipr
 *.iws
 
-#Maven
-target
-release.properties
-pom.xml.*
+#VS Code
+.vscode/
 
 #OSX
 .DS_Store
+truth.md
+instruction.md
+fix.patch
+test.patch
+golden.patch
